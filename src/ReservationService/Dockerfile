@@ -5,11 +5,15 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["ReservationService/ReservationService.csproj", "ReservationService/"]
-RUN dotnet restore "ReservationService/ReservationService.csproj"
-COPY . .
+
+COPY ["src/ReservationService/ReservationService.csproj", "ReservationService/"]
+COPY ["src/SharedKernel/SharedKernel.csproj", "SharedKernel/"]
+
+
+RUN dotnet restore "/src/ReservationService/ReservationService.csproj"
+COPY /src .
 WORKDIR "/src/ReservationService"
-RUN dotnet build "ReservationService.csproj" -c Release -o /app/build
+RUN dotnet build -c Release -o /app/build
 
 FROM build AS publish
 RUN dotnet publish "ReservationService.csproj" -c Release -o /app/publish
