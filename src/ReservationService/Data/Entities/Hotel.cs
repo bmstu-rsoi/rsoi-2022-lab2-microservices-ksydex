@@ -1,8 +1,9 @@
-namespace ReservationService.Models;
+using SharedKernel.Common.AbstractClasses;
 
-public class Hotel
+namespace ReservationService.Data.Entities;
+
+public class Hotel : EntityBase
 {
-    public int Id { get; set; }
     public Guid HotelUid { get; set; }
     
     public string Name { get; set; } = string.Empty;

@@ -1,8 +1,9 @@
-namespace ReservationService.Models;
+using SharedKernel.Common.AbstractClasses;
 
-public class Reservation
+namespace ReservationService.Data.Entities;
+
+public class Reservation : EntityBase
 {
-    public int Id { get; set; }
     public Guid ReservationUid { get; set; }
     
     public string Username { get; set; } = string.Empty;
