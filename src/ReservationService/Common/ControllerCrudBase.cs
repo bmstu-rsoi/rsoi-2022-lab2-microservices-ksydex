@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReservationService.Data;
 using SharedKernel.Common.AbstractClasses;
+using SharedKernel.Extensions;
 
 namespace ReservationService.Common;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class ControllerCrudBase<TEntity, TDto> : ControllerBase
+public class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBase
 where TEntity: EntityBase, new()
 {
     private readonly IMapper _mapper;
@@ -32,9 +33,13 @@ where TEntity: EntityBase, new()
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<TDto>>> GetAllAsync()
+    public async Task<ActionResult<List<TDto>>> GetAllAsync([FromQuery] TFilter filter, [FromQuery] int size = 10, [FromQuery] int page = 1)
     {
-        var lst = await _dbContext.Set<TEntity>()
+        var q = AttachFilterToQueryable(_dbContext.Set<TEntity>(), filter)
+            .OrderByDescending(x => x.Id);
+        
+        var lst = await q
+            .Page(page, size)
             .ToListAsync();
         
         return Ok(_mapper.Map<List<TDto>>(lst));
@@ -84,4 +89,7 @@ where TEntity: EntityBase, new()
     protected virtual void MapDtoToEntity(TEntity e, TDto dto)
     {
     }
+
+    protected virtual IQueryable<TEntity> AttachFilterToQueryable(IQueryable<TEntity> q, TFilter f)
+        => q;
 }
