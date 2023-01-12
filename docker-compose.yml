@@ -29,6 +29,7 @@ services:
       - pgadmin:/root/.pgadmin
 
   reservation-service:
+    container_name: "reservation_service"
     depends_on:
       - "postgres"
     build:
@@ -39,6 +40,20 @@ services:
       - ${RESERVATION_SERVICE_OUT_PORT}:80
     env_file:
       - .env
+
+
+  gateway:
+    depends_on:
+      - "reservation-service"
+    build:
+      context: .
+      dockerfile: ./src/Gateway/Dockerfile
+    restart: always
+    ports:
+      - ${GATEWAY_OUT_PORT}:80
+    env_file:
+      - .env
+
 
 volumes:
   db-data:
