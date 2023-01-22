@@ -11,9 +11,9 @@ using SharedKernel.Extensions;
 
 namespace LoyaltyService.Controllers;
 
-public class HotelsController : ControllerCrudBase<Loyalty, LoyaltyDto, LoyaltyFilter>
+public class LoyaltyController : ControllerCrudBase<Loyalty, LoyaltyDto, LoyaltyFilter>
 {
-    public HotelsController(IMapper mapper, AppDbContext dbContext) : base(mapper, dbContext)
+    public LoyaltyController(IMapper mapper, AppDbContext dbContext) : base(mapper, dbContext)
     {
     }
 
