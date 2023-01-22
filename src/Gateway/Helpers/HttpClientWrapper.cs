@@ -1,5 +1,6 @@
-using System.Text.Json;
+using Newtonsoft.Json;
 using SharedKernel.Helpers;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Gateway.Helpers;
 
@@ -27,10 +28,11 @@ public class HttpClientWrapper
 
         var response = await _client.SendAsync(request);
 
-        await HttpExceptionHelpers.HandleResponseStatusCode(response);
+        // await HttpExceptionHelpers.HandleResponseStatusCode(response);
 
         var content = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<T>(content);
+        Console.WriteLine("Response content: " + content);
+        return JsonConvert.DeserializeObject<T>(content);
     }
 
     public async Task<T?> PostAsync<T, TU>(string url, TU data, IDictionary<string, string>? headers = null,
@@ -49,7 +51,7 @@ public class HttpClientWrapper
             new StringContent(JsonSerializer.Serialize(data), System.Text.Encoding.UTF8, "application/json");
         var response = await _client.SendAsync(request);
         
-        await HttpExceptionHelpers.HandleResponseStatusCode(await _client.SendAsync(request));
+        // await HttpExceptionHelpers.HandleResponseStatusCode(await _client.SendAsync(request));
         
         var content = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<T>(content);

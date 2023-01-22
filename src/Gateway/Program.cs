@@ -1,3 +1,5 @@
+using Gateway.Middlewares;
+
 var builder = WebApplication.CreateBuilder(args);
 
 var configuration = builder.Configuration; // allows both to access and to set up the config
@@ -26,6 +28,10 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseHttpLogging();
+
+Console.WriteLine($"ENV DEV: {app.Environment.IsDevelopment()}");
+
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())
 // {
@@ -34,6 +40,9 @@ var app = builder.Build();
 // }
 
 using var scope = app.Services.CreateScope();
+
+app.UseMiddleware<ErrorHandlerMiddleware>();
+
 var services = scope.ServiceProvider;
 //
 // try

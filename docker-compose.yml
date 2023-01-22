@@ -53,6 +53,8 @@ services:
       - ${GATEWAY_OUT_PORT}:80
     env_file:
       - .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
 
 
 volumes:

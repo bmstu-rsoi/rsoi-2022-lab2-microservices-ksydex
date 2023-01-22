@@ -54,6 +54,7 @@ public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBas
     public async Task<ActionResult<List<TDto>>> GetAllAsync([FromQuery] TFilter filter, [FromQuery] int size = 10,
         [FromQuery] int page = 1)
     {
+        Console.WriteLine("Filters: " + JsonSerializer.Serialize(filter));
         var q = AttachEagerLoadingStrategyToQueryable(
             AttachFilterToQueryable(_dbContext.Set<TEntity>(), filter)
                 .OrderByDescending(x => x.Id));
@@ -62,6 +63,7 @@ public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBas
             .Page(page, size)
             .ToListAsync();
 
+        
         return Ok(_mapper.Map<List<TDto>>(lst));
     }
 
