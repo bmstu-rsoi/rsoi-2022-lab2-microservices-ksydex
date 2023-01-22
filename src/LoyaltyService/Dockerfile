@@ -5,11 +5,15 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["LoyaltyService/LoyaltyService.csproj", "LoyaltyService/"]
-RUN dotnet restore "LoyaltyService/LoyaltyService.csproj"
-COPY . .
+
+COPY ["src/LoyaltyService/LoyaltyService.csproj", "LoyaltyService/"]
+COPY ["src/SharedKernel/SharedKernel.csproj", "SharedKernel/"]
+
+
+RUN dotnet restore "/src/LoyaltyService/LoyaltyService.csproj"
+COPY /src .
 WORKDIR "/src/LoyaltyService"
-RUN dotnet build "LoyaltyService.csproj" -c Release -o /app/build
+RUN dotnet build -c Release -o /app/build
 
 FROM build AS publish
 RUN dotnet publish "LoyaltyService.csproj" -c Release -o /app/publish
