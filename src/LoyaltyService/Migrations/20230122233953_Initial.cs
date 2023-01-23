@@ -38,7 +38,7 @@ namespace ReservationService.Migrations
                 "id", "user_name", "reservation_count", "status", "discount"
             }, values: new object[]
             {
-                1, "Test max", 25, "GOLD", 10 
+                1, "Test Max", 25, "GOLD", 10 
             });
         }
 
