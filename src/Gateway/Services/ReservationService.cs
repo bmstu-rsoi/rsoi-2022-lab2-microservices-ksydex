@@ -1,6 +1,7 @@
 using Gateway.Common;
 using Gateway.Data.Dtos;
 using Gateway.Helpers;
+using SharedKernel.Common.AbstractClasses;
 using SharedKernel.Exceptions;
 
 namespace Gateway.Services;
@@ -19,8 +20,8 @@ public class ReservationClientService : ClientServiceBase
         _paymentClientService = paymentClientService;
     }
 
-    public async Task<List<HotelDto>?> GetAllHotelsAsync(int page, int size)
-        => await Client.GetAsync<List<HotelDto>>(BuildUri("api/v1/hotels"), null, new Dictionary<string, string>
+    public async Task<PaginationModel<HotelDto>?> GetAllHotelsAsync(int page, int size)
+        => await Client.GetAsync<PaginationModel<HotelDto>>(BuildUri("api/v1/hotels"), null, new Dictionary<string, string>
         {
             { "page", page.ToString() },
             { "size", size.ToString() }
@@ -103,8 +104,8 @@ public class ReservationClientService : ClientServiceBase
     public async Task<ReservationDto?> UpdateReservationAsync(string id, ReservationDto dto)
         => await Client.PatchAsync<ReservationDto, ReservationDto>(BuildUri("api/v1/reservations/" + id), dto);
 
-    public async Task<List<ReservationDto>?> GetAllReservationsAsync(int page, int size, string userName)
-        => await Client.GetAsync<List<ReservationDto>>(BuildUri("api/v1/reservations"), null,
+    public async Task<PaginationModel<ReservationDto>?> GetAllReservationsAsync(int page, int size, string userName)
+        => await Client.GetAsync<PaginationModel<ReservationDto>>(BuildUri("api/v1/reservations"), null,
             new Dictionary<string, string>
             {
                 { "page", page.ToString() },
@@ -121,6 +122,6 @@ public class ReservationClientService : ClientServiceBase
         if (loyalty == null) throw new NotFoundException();
 
         return new UserInfoDto(loyalty,
-            (await GetAllReservationsAsync(1, 100, userName)) ?? new List<ReservationDto>());
+            (await GetAllReservationsAsync(1, 100, userName))?.Items ?? new List<ReservationDto>());
     }
 }

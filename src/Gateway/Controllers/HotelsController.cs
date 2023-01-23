@@ -3,6 +3,7 @@ using Gateway.Constants;
 using Gateway.Data.Dtos;
 using Gateway.Services;
 using Microsoft.AspNetCore.Mvc;
+using SharedKernel.Common.AbstractClasses;
 
 namespace Gateway.Controllers;
 
@@ -19,7 +20,7 @@ public class HotelsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<HotelDto>>> GetAll([FromQuery, Required] int page = 1,
+    public async Task<ActionResult<PaginationModel<HotelDto>>> GetAll([FromQuery, Required] int page = 1,
         [FromQuery, Required] int size = 10)
         => Ok(await _reservationClientService.GetAllHotelsAsync(page, size));
 

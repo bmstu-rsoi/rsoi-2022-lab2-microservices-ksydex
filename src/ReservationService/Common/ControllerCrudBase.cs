@@ -51,7 +51,7 @@ public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBas
 
 
     [HttpGet]
-    public async Task<ActionResult<List<TDto>>> GetAllAsync([FromQuery] TFilter filter, [FromQuery] int size = 10,
+    public async Task<ActionResult<PaginationModel<TDto>>> GetAllAsync([FromQuery] TFilter filter, [FromQuery] int size = 10,
         [FromQuery] int page = 1)
     {
         Console.WriteLine("Filters: " + JsonSerializer.Serialize(filter));
@@ -64,7 +64,13 @@ public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBas
             .ToListAsync();
 
         
-        return Ok(_mapper.Map<List<TDto>>(lst));
+        return Ok(new PaginationModel<TDto>
+        {
+            Page = page,
+            PageSize = size,
+            TotalElements = await q.CountAsync(),
+            Items = _mapper.Map<List<TDto>>(lst)
+        });
     }
 
     [HttpPost]
