@@ -31,6 +31,15 @@ namespace ReservationService.Migrations
                 {
                     table.PrimaryKey("pk_loyalties", x => x.id);
                 });
+            
+            
+            migrationBuilder.InsertData(table: "loyalties", columns: new []
+            {
+                "id", "user_name", "reservation_count", "status", "discount"
+            }, values: new object[]
+            {
+                1, "Test max", 25, "GOLD", 10 
+            });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
