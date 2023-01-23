@@ -114,4 +114,13 @@ public class ReservationClientService : ClientServiceBase
 
     public async Task<ReservationDto?> GetReservationByUidAsync(string uid)
         => await Client.GetAsync<ReservationDto>(BuildUri("api/v1/reservations/" + uid));
+
+    public async Task<UserInfoDto> GetUserInfoAsync(string userName)
+    {
+        var loyalty = await _loyaltyClientService.GetAsync(userName);
+        if (loyalty == null) throw new NotFoundException();
+
+        return new UserInfoDto(loyalty,
+            (await GetAllReservationsAsync(1, 100, userName)) ?? new List<ReservationDto>());
+    }
 }

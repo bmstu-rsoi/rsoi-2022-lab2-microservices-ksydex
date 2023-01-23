@@ -75,7 +75,7 @@ CREATE TABLE loyalty
 GET {{baseUrl}}/api/v1/hotels&page={{page}}&size={{size}}
 ```
 
-#### Получить полную информацию о пользователе
+#### ✅ Получить полную информацию о пользователе
 
 Возвращается информация о бронированиях и статусе в системе лояльности.
 
@@ -145,7 +145,7 @@ DELETE {{baseUrl}}/api/v1/reservations/{{reservationUid}}
 X-User-Name: {{username}}
 ```
 
-#### Получить информацию о статусе в программе лояльности
+#### ✅ Получить информацию о статусе в программе лояльности
 
 ```http request
 GET {{baseUrl}}/api/v1/loyalty
