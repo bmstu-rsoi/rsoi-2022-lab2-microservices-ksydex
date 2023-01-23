@@ -92,8 +92,10 @@ public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBas
         MapDtoToEntity(e, dto);
 
         await _dbContext.SaveChangesAsync();
+        _dbContext.ChangeTracker.Clear();
+        _dbContext.Entry(e).State = EntityState.Detached;
 
-        return Ok(_mapper.Map<TDto>(e));
+        return Ok(GetByIdAsync(id.ToString()));
     }
 
     [HttpDelete("{id:int}")]
