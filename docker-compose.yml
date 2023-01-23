@@ -40,6 +40,8 @@ services:
       - ${RESERVATION_SERVICE_OUT_PORT}:80
     env_file:
       - .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
         
   loyalty-service:
     container_name: "loyalty_service"

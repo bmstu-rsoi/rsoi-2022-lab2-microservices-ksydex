@@ -34,4 +34,11 @@ public class ReservationsController : ControllerBase
         [FromHeader(Name = HeaderConstants.UserName)]
         string userName)
         => Ok(await _reservationClientService.BookHotelAsync(model.HotelUid, model.StartDate, model.EndDate, userName));
+
+
+    [HttpDelete("{uId}")]
+    public async Task<ActionResult<ReservationDto>> Book(string uId,
+        [FromHeader(Name = HeaderConstants.UserName)]
+        string userName)
+        => Ok(await _reservationClientService.CancelBookHotelAsync(uId, userName));
 }

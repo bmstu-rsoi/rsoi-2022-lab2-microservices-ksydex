@@ -81,21 +81,25 @@ public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBas
         return CreatedAtAction("GetById", new { id = e.Id }, e);
     }
 
-    [HttpPatch("{id:int}")]
-    public async Task<ActionResult<TDto>> UpdateAsync([FromBody] TDto dto, int id)
+    [HttpPatch("{id}")]
+    public async Task<ActionResult<TDto>> UpdateAsync([FromBody] TDto dto, string id)
     {
+        int? intId = int.TryParse(id, out var asInt) ? asInt : null;
+        Guid? guid = Guid.TryParse(id, out var asGuid) ? asGuid : null;
+
+        if (guid == null) return BadRequest("UID is in wrong format");
+        if (intId == null && !IsUidSupported) return BadRequest("Entity doesn't support UID");
+        
         var e = await _dbContext.Set<TEntity>()
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(intId == null ? UidPredicate(guid.Value)! : x => x.Id == intId);
 
         if (e == null) return NotFound();
 
         MapDtoToEntity(e, dto);
 
         await _dbContext.SaveChangesAsync();
-        _dbContext.ChangeTracker.Clear();
-        _dbContext.Entry(e).State = EntityState.Detached;
 
-        return Ok(GetByIdAsync(id.ToString()));
+        return await GetByIdAsync(id);
     }
 
     [HttpDelete("{id:int}")]

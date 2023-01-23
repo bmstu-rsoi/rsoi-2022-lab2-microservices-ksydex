@@ -15,6 +15,10 @@ public class PaymentClientService : ClientServiceBase
         });
 
 
+    
+    public async Task<PaymentDto?> GetByUidAsync(string uid)
+        => await Client.GetAsync<PaymentDto>(BuildUri("api/v1/payments/" + uid));
+    
     public async Task<PaymentDto?> UpdateAsync(int id, PaymentDto dto)
         => await Client.PatchAsync<PaymentDto, PaymentDto>(BuildUri("api/v1/payments/" + id), dto);
 
