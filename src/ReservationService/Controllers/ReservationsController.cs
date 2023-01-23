@@ -37,7 +37,7 @@ public class ReservationsController : ControllerCrudBase<Reservation, Reservatio
         e.StartDate = dto.StartDate;
         e.EndDate = dto.EndDate;
         e.PaymentUid = dto.PaymentUid;
-        e.HotelId = dto.HotelId;
+        e.HotelUid = dto.HotelUid;
 
     }
 }

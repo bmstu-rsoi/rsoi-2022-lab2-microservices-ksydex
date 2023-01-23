@@ -12,5 +12,5 @@ public class ReservationDto
     public Guid PaymentUid { get; set; }
 
     public HotelDto? Hotel { get; set; }
-    public int? HotelId { get; set; }
+    public Guid? HotelUid { get; set; }
 }

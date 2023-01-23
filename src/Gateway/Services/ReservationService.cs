@@ -91,7 +91,7 @@ public class ReservationClientService : ClientServiceBase
             UserName = userName,
             StartDate = startDate,
             EndDate = endDate,
-            HotelId = hotel.Id,
+            HotelUid = hotel.HotelUid,
             PaymentUid = payment.PaymentUid,
             Status = "PAID"
         }) ?? throw new Exception("Error while creating reservation");

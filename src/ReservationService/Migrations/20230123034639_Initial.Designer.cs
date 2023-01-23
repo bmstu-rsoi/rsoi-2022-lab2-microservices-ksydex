@@ -12,8 +12,8 @@ using ReservationService.Data;
 namespace ReservationService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230112030318_Init")]
-    partial class Init
+    [Migration("20230123034639_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -69,6 +69,19 @@ namespace ReservationService.Migrations
                         .HasName("pk_hotels");
 
                     b.ToTable("hotels", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Address = "Неглинная ул., 4",
+                            City = "Москва",
+                            Country = "Россия",
+                            HotelUid = new Guid("049161bb-badd-4fa8-9d90-87c9a82b0668"),
+                            Name = "Ararat Park Hyatt Moscow",
+                            Price = 10000,
+                            Stars = 5
+                        });
                 });
 
             modelBuilder.Entity("ReservationService.Data.Entities.Reservation", b =>
@@ -87,6 +100,10 @@ namespace ReservationService.Migrations
                     b.Property<int?>("HotelId")
                         .HasColumnType("integer")
                         .HasColumnName("hotel_id");
+
+                    b.Property<Guid?>("HotelUid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("hotel_uid");
 
                     b.Property<Guid>("PaymentUid")
                         .HasColumnType("uuid")

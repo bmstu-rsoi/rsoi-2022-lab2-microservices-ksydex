@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace ReservationService.Migrations
 {
-    public partial class Init : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -41,7 +41,8 @@ namespace ReservationService.Migrations
                     start_date = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     end_date = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     payment_uid = table.Column<Guid>(type: "uuid", nullable: false),
-                    hotel_id = table.Column<int>(type: "integer", nullable: true)
+                    hotel_id = table.Column<int>(type: "integer", nullable: true),
+                    hotel_uid = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -53,25 +54,15 @@ namespace ReservationService.Migrations
                         principalColumn: "id");
                 });
 
+            migrationBuilder.InsertData(
+                table: "hotels",
+                columns: new[] { "id", "address", "city", "country", "hotel_uid", "name", "price", "stars" },
+                values: new object[] { 1, "Неглинная ул., 4", "Москва", "Россия", new Guid("049161bb-badd-4fa8-9d90-87c9a82b0668"), "Ararat Park Hyatt Moscow", 10000, 5 });
+
             migrationBuilder.CreateIndex(
                 name: "ix_reservations_hotel_id",
                 table: "reservations",
                 column: "hotel_id");
-
-            migrationBuilder.InsertData(table: "hotels", columns: new []
-            {
-                "id", "hotel_uid", "name", "country", "city",
-                "address", "stars", "price"
-            }, values: new object[]
-            {
-                1, "049161bb-badd-4fa8-9d90-87c9a82b0668",
-                "Ararat Park Hyatt Moscow",
-                "Россия",
-                "Москва",
-                "Неглинная ул., 4",
-                5,
-                10000
-            });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

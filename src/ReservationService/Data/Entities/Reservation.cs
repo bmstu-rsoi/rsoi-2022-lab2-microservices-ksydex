@@ -14,5 +14,5 @@ public class Reservation : EntityBase
     public Guid PaymentUid { get; set; }
 
     public Hotel? Hotel { get; set; }
-    public int? HotelId { get; set; }
+    public Guid? HotelUid { get; set; }
 }
