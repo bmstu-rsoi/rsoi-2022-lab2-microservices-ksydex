@@ -9,9 +9,9 @@ using SharedKernel.Extensions;
 
 namespace PaymentService.Controllers;
 
-public class PaymentController : ControllerCrudBase<Payment, PaymentDto, PaymentFilter>
+public class PaymentsController : ControllerCrudBase<Payment, PaymentDto, PaymentFilter>
 {
-    public PaymentController(IMapper mapper, AppDbContext dbContext) : base(mapper, dbContext)
+    public PaymentsController(IMapper mapper, AppDbContext dbContext) : base(mapper, dbContext)
     {
     }
 

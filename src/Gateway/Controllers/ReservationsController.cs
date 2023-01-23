@@ -13,16 +13,25 @@ public class ReservationsController : ControllerBase
 
     public ReservationsController()
     {
-        _reservationClientService = new ReservationClientService(new LoyaltyClientService());
+        _reservationClientService =
+            new ReservationClientService(new LoyaltyClientService(), new PaymentClientService());
     }
 
     [HttpGet]
     public async Task<ActionResult<List<ReservationDto>>> GetAll(
-        [FromHeader(Name = HeaderConstants.UserName)] string userName, [FromQuery] int page = 1,
+        [FromHeader(Name = HeaderConstants.UserName)]
+        string userName, [FromQuery] int page = 1,
         [FromQuery] int size = 10)
         => Ok(await _reservationClientService.GetAllReservationsAsync(page, size, userName));
 
     [HttpGet("{uId}")]
     public async Task<ActionResult<ReservationDto>> GetByUId(string uId)
         => Ok(await _reservationClientService.GetReservationByUidAsync(uId));
+
+
+    [HttpPost]
+    public async Task<ActionResult<ReservationDto>> Book(BookHotelDto model,
+        [FromHeader(Name = HeaderConstants.UserName)]
+        string userName)
+        => Ok(await _reservationClientService.BookHotelAsync(model.HotelUid, model.StartDate, model.EndDate, userName));
 }

@@ -14,17 +14,13 @@ public class HotelsController : ControllerBase
 
     public HotelsController()
     {
-        _reservationClientService = new ReservationClientService(new LoyaltyClientService());
+        _reservationClientService =
+            new ReservationClientService(new LoyaltyClientService(), new PaymentClientService());
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<HotelDto>>> GetAll([FromQuery, Required] int page = 1, [FromQuery, Required] int size = 10)
+    public async Task<ActionResult<List<HotelDto>>> GetAll([FromQuery, Required] int page = 1,
+        [FromQuery, Required] int size = 10)
         => Ok(await _reservationClientService.GetAllHotelsAsync(page, size));
-    
-    [HttpPost]
-    public async Task<IActionResult> BookHotel(BookHotelDto model, [FromHeader(Name = HeaderConstants.UserName)] string userName)
-    {
-        await _reservationClientService.BookHotelAsync(model.HotelUid, model.StartDate, model.EndDate, userName);
-        return Ok();
-    }
+
 }

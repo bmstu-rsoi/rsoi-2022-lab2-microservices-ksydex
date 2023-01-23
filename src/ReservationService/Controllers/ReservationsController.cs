@@ -32,7 +32,7 @@ public class ReservationsController : ControllerCrudBase<Reservation, Reservatio
 
     protected override void MapDtoToEntity(Reservation e, ReservationDto dto)
     {
-        e.Username = dto.Username;
+        e.Username = dto.UserName;
         e.Status = dto.Status;
         e.StartDate = dto.StartDate;
         e.EndDate = dto.EndDate;
