@@ -86,7 +86,7 @@ public class ReservationClientService : ClientServiceBase
         }) ?? throw new Exception("Error while updating loyalty");
 
 
-        return await CreateReservationAsync(new ReservationDto
+        var reservation = await CreateReservationAsync(new ReservationDto
         {
             UserName = userName,
             StartDate = startDate,
@@ -95,6 +95,8 @@ public class ReservationClientService : ClientServiceBase
             PaymentUid = payment.PaymentUid,
             Status = "PAID"
         }) ?? throw new Exception("Error while creating reservation");
+
+        return await GetReservationByUidAsync(reservation.ReservationUid.ToString()) ?? throw new Exception("Error");
     }
 
     public async Task<ReservationDto?> CreateReservationAsync(ReservationDto dto)

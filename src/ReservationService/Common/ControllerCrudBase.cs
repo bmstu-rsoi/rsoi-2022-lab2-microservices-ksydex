@@ -41,7 +41,7 @@ public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBas
         if (guid == null) return BadRequest("UID is in wrong format");
         if (intId == null && !IsUidSupported) return BadRequest("Entity doesn't support UID");
 
-        var e = await AttachEagerLoadingStrategyToQueryable(_dbContext.Set<TEntity>())
+        var e = await AttachEagerLoadingStrategyToQueryable(_dbContext.Set<TEntity>().AsNoTracking())
             .FirstOrDefaultAsync(intId == null ? UidPredicate(guid.Value)! : x => x.Id == intId);
 
         if (e == null) return NotFound();
@@ -104,6 +104,7 @@ public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBas
         MapDtoToEntity(e, dto);
 
         await _dbContext.SaveChangesAsync();
+        _dbContext.Entry(e).State = EntityState.Detached;
 
         return await GetByIdAsync(id);
     }
