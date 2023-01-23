@@ -51,7 +51,7 @@ CREATE TABLE payment
 );
 ```
 
-#### Loyalty Service
+#### Loyalty Service ✅
 
 Сервис запускается на порту 8050.
 

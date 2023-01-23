@@ -4,16 +4,22 @@ namespace Gateway.Common;
 
 public abstract class ClientServiceBase
 {
-    private readonly string _baseUri;
+    protected abstract string BaseUri { get; }
     protected readonly HttpClientWrapper Client;
 
-
-    public ClientServiceBase(string baseUri)
+    public ClientServiceBase()
     {
         Client = new HttpClientWrapper();
-        _baseUri = baseUri.Last() != '/' ? baseUri + "/" : baseUri;
     }
 
+    private string GetBaseUri()
+        => BaseUri;
+        
     protected string BuildUri(string append)
-        => _baseUri + append;
+    {
+        var baseUri = GetBaseUri();
+        baseUri = baseUri.Last() != '/' ? baseUri + "/" : baseUri;
+        
+        return baseUri + append;
+    }
 }

@@ -13,7 +13,7 @@ public class ReservationsController : ControllerBase
 
     public ReservationsController()
     {
-        _reservationClientService = new ReservationClientService("http://reservation_service:80");
+        _reservationClientService = new ReservationClientService(new LoyaltyClientService());
     }
 
     [HttpGet]

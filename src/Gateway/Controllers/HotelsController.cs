@@ -14,7 +14,7 @@ public class HotelsController : ControllerBase
 
     public HotelsController()
     {
-        _reservationClientService = new ReservationClientService("http://reservation_service:80");
+        _reservationClientService = new ReservationClientService(new LoyaltyClientService());
     }
 
     [HttpGet]
@@ -22,9 +22,9 @@ public class HotelsController : ControllerBase
         => Ok(await _reservationClientService.GetAllHotelsAsync(page, size));
     
     [HttpPost]
-    public async Task<IActionResult> BookHotel(BookHotelDto model)
+    public async Task<IActionResult> BookHotel(BookHotelDto model, [FromHeader(Name = HeaderConstants.UserName)] string userName)
     {
-        await _reservationClientService.BookHotelAsync(model.HotelUid, model.StartDate, model.EndDate);
+        await _reservationClientService.BookHotelAsync(model.HotelUid, model.StartDate, model.EndDate, userName);
         return Ok();
     }
 }
