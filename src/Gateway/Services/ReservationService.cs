@@ -33,7 +33,7 @@ public class ReservationClientService : ClientServiceBase
     {
         var reservation = await GetReservationByUidAsync(uId);
         if (reservation == null || reservation.Status == "CANCELED") throw new NotFoundException();
-        
+
 
         if (reservation.UserName != userName) throw new Exception("Is not your reservation");
 
@@ -44,7 +44,7 @@ public class ReservationClientService : ClientServiceBase
         payment = await _paymentClientService.UpdateAsync(payment.Id, payment);
 
 
-        var loyalty = (await _loyaltyClientService.GetAllAsync(1, 1, userName))?.FirstOrDefault() ??
+        var loyalty = await _loyaltyClientService.GetAsync(userName) ??
                       throw new NotFoundException("Loyalty not found");
 
         loyalty.ReservationCount = loyalty.ReservationCount - 1;
@@ -64,7 +64,7 @@ public class ReservationClientService : ClientServiceBase
 
         var nightCount = (endDate - startDate).Days;
 
-        var loyalty = (await _loyaltyClientService.GetAllAsync(1, 1, userName))?.FirstOrDefault() ??
+        var loyalty = await _loyaltyClientService.GetAsync(userName) ??
                       throw new NotFoundException("Loyalty not found");
         var cost = (hotel.Price * nightCount);
         cost = cost - cost * (loyalty.Discount / 100);
@@ -98,8 +98,8 @@ public class ReservationClientService : ClientServiceBase
 
     public async Task<ReservationDto?> CreateReservationAsync(ReservationDto dto)
         => await Client.PostAsync<ReservationDto, ReservationDto>(BuildUri("api/v1/reservations"), dto);
-    
-    
+
+
     public async Task<ReservationDto?> UpdateReservationAsync(string id, ReservationDto dto)
         => await Client.PatchAsync<ReservationDto, ReservationDto>(BuildUri("api/v1/reservations/" + id), dto);
 

@@ -10,7 +10,10 @@ public class LoyaltyClientService : ClientServiceBase
     public LoyaltyClientService() : base()
     {
     }
-    
+
+    public async Task<LoyaltyDto?> GetAsync(string userName)
+        => (await GetAllAsync(1, 1, userName))?.FirstOrDefault();
+
     public async Task<List<LoyaltyDto>?> GetAllAsync(int page, int size, string userName)
         => await Client.GetAsync<List<LoyaltyDto>>(BuildUri("api/v1/loyalty"), null, new Dictionary<string, string>
         {
