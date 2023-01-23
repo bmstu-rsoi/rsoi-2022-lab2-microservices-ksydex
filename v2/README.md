@@ -36,7 +36,7 @@ CREATE TABLE hotels
 );
 ```
 
-#### Payment Service
+#### Payment Service ✅
 
 Сервис запускается на порту 8060.
 
