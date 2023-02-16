@@ -57,7 +57,7 @@ public class ReservationClientService : ClientServiceBase
         return await UpdateReservationAsync(reservation.ReservationUid.ToString(), reservation);
     }
 
-    public async Task<ReservationDto> BookHotelAsync(string hotelUid, DateTime startDate, DateTime endDate,
+    public async Task<ReservationBookDto> BookHotelAsync(string hotelUid, DateTime startDate, DateTime endDate,
         string userName)
     {
         var hotel = await GetHotelByUIdAsync(hotelUid);
@@ -68,9 +68,9 @@ public class ReservationClientService : ClientServiceBase
         var loyalty = await _loyaltyClientService.GetAsync(userName) ??
                       throw new NotFoundException("Loyalty not found");
         var cost = (hotel.Price * nightCount);
-        cost = cost - cost * (loyalty.Discount / 100);
-
-
+        Console.WriteLine("Cost: {0}", cost);
+        cost = (int)(cost * (1 - loyalty.Discount / 100.0));
+        Console.WriteLine("Cost after : {0}", cost);
         var payment = await _paymentClientService.CreateAsync(new PaymentDto
         {
             Price = cost,
@@ -96,7 +96,23 @@ public class ReservationClientService : ClientServiceBase
             Status = "PAID"
         }) ?? throw new Exception("Error while creating reservation");
 
-        return await GetReservationByUidAsync(reservation.ReservationUid.ToString()) ?? throw new Exception("Error");
+        var r = await GetReservationByUidAsync(reservation.ReservationUid.ToString());
+
+        if (r == null) throw new Exception("Error");
+        return new ReservationBookDto
+        {
+            ReservationUid = r.ReservationUid,
+            HotelUid = r.HotelUid!.Value,
+            StartDate = r.StartDate!.Value,
+            EndDate = r.EndDate!.Value,
+            Discount = loyalty.Discount,
+            Status = r.Status,
+            Payment = new PaymentBookDto
+            {
+                Status = payment.Status,
+                Price = payment.Price
+            }
+        };
     }
 
     public async Task<ReservationDto?> CreateReservationAsync(ReservationDto dto)
@@ -107,7 +123,8 @@ public class ReservationClientService : ClientServiceBase
         => await Client.PatchAsync<ReservationDto, ReservationDto>(BuildUri("api/v1/reservations/" + id), dto);
 
     public async Task<PaginationModel<ReservationDto>?> GetAllReservationsAsync(int page, int size, string userName)
-        => await Client.GetAsync<PaginationModel<ReservationDto>>(BuildUri("api/v1/reservations"), null,
+    {
+        var r = await Client.GetAsync<PaginationModel<ReservationDto>>(BuildUri("api/v1/reservations"), null,
             new Dictionary<string, string>
             {
                 { "page", page.ToString() },
@@ -115,8 +132,25 @@ public class ReservationClientService : ClientServiceBase
                 { "UserName", userName }
             });
 
+        if (r == null) throw new NotFoundException();
+        
+        foreach (var item in r.Items)
+        {
+            item.Payment = await _paymentClientService.GetByUidAsync(item.PaymentUid.ToString());
+        }
+
+        return r;
+    }
+
     public async Task<ReservationDto?> GetReservationByUidAsync(string uid)
-        => await Client.GetAsync<ReservationDto>(BuildUri("api/v1/reservations/" + uid));
+    {
+        var r = await Client.GetAsync<ReservationDto>(BuildUri("api/v1/reservations/" + uid));
+        if (r == null) throw new NotFoundException();
+
+        r.Payment = await _paymentClientService.GetByUidAsync(r.PaymentUid.ToString());
+        
+        return r;
+    }
 
     public async Task<UserInfoDto> GetUserInfoAsync(string userName)
     {

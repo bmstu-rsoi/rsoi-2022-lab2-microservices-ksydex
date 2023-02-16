@@ -15,8 +15,8 @@ namespace ReservationService.Common;
 public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBase
     where TEntity : EntityBase, new()
 {
-    private readonly IMapper _mapper;
-    private readonly AppDbContext _dbContext;
+    protected readonly IMapper Mapper;
+    protected readonly AppDbContext DbContext;
 
     protected virtual Expression<Func<TEntity, bool>>? UidPredicate(Guid uId) => null;
     protected bool IsUidSupported => UidPredicate(Guid.NewGuid()) != null;
@@ -28,8 +28,8 @@ public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBas
 
     public ControllerCrudBase(IMapper mapper, AppDbContext dbContext)
     {
-        _mapper = mapper;
-        _dbContext = dbContext;
+        Mapper = mapper;
+        DbContext = dbContext;
     }
 
     [HttpGet("{id}")]
@@ -41,12 +41,12 @@ public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBas
         if (guid == null) return BadRequest("UID is in wrong format");
         if (intId == null && !IsUidSupported) return BadRequest("Entity doesn't support UID");
 
-        var e = await AttachEagerLoadingStrategyToQueryable(_dbContext.Set<TEntity>().AsNoTracking())
+        var e = await AttachEagerLoadingStrategyToQueryable(DbContext.Set<TEntity>().AsNoTracking())
             .FirstOrDefaultAsync(intId == null ? UidPredicate(guid.Value)! : x => x.Id == intId);
 
         if (e == null) return NotFound();
 
-        return Ok(_mapper.Map<TDto>(e));
+        return Ok(await ToDtoAsync(e));
     }
 
 
@@ -56,20 +56,19 @@ public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBas
     {
         Console.WriteLine("Filters: " + JsonSerializer.Serialize(filter));
         var q = AttachEagerLoadingStrategyToQueryable(
-            AttachFilterToQueryable(_dbContext.Set<TEntity>(), filter)
+            AttachFilterToQueryable(DbContext.Set<TEntity>(), filter)
                 .OrderByDescending(x => x.Id));
 
         var lst = await q
             .Page(page, size)
             .ToListAsync();
-
         
         return Ok(new PaginationModel<TDto>
         {
             Page = page,
             PageSize = size,
             TotalElements = await q.CountAsync(),
-            Items = _mapper.Map<List<TDto>>(lst)
+            Items = await ToDtoListAsync(lst)
         });
     }
 
@@ -81,8 +80,8 @@ public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBas
 
         if (IsUidSupported) SetUid(e, Guid.NewGuid());
 
-        await _dbContext.AddAsync(e);
-        await _dbContext.SaveChangesAsync();
+        await DbContext.AddAsync(e);
+        await DbContext.SaveChangesAsync();
 
         return CreatedAtAction("GetById", new { id = e.Id }, e);
     }
@@ -96,15 +95,15 @@ public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBas
         if (guid == null) return BadRequest("UID is in wrong format");
         if (intId == null && !IsUidSupported) return BadRequest("Entity doesn't support UID");
         
-        var e = await _dbContext.Set<TEntity>()
+        var e = await DbContext.Set<TEntity>()
             .FirstOrDefaultAsync(intId == null ? UidPredicate(guid.Value)! : x => x.Id == intId);
 
         if (e == null) return NotFound();
 
         MapDtoToEntity(e, dto);
 
-        await _dbContext.SaveChangesAsync();
-        _dbContext.Entry(e).State = EntityState.Detached;
+        await DbContext.SaveChangesAsync();
+        DbContext.Entry(e).State = EntityState.Detached;
 
         return await GetByIdAsync(id);
     }
@@ -112,13 +111,13 @@ public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBas
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> RemoveAsync(int id)
     {
-        var e = await _dbContext.Set<TEntity>()
+        var e = await DbContext.Set<TEntity>()
             .FirstOrDefaultAsync(x => x.Id == id);
 
         if (e == null) return NotFound();
 
-        _dbContext.Remove(e);
-        await _dbContext.SaveChangesAsync();
+        DbContext.Remove(e);
+        await DbContext.SaveChangesAsync();
 
         return NoContent();
     }
@@ -132,4 +131,15 @@ public abstract class ControllerCrudBase<TEntity, TDto, TFilter> : ControllerBas
 
     protected virtual IQueryable<TEntity> AttachEagerLoadingStrategyToQueryable(IQueryable<TEntity> q)
         => q;
+
+    protected virtual Task<TDto> ToDtoAsync(TEntity e) => Task.FromResult(Mapper.Map<TDto>(e));
+
+    protected virtual async Task<List<TDto>> ToDtoListAsync(List<TEntity> list)
+    {
+        var r = new List<TDto>();
+        foreach (var item in list)
+            r.Add(await ToDtoAsync(item));
+        
+        return r;
+    }
 }

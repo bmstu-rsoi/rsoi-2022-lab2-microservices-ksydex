@@ -1,3 +1,5 @@
+using System.ComponentModel;
+using Gateway.Helpers;
 using Gateway.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,7 +8,11 @@ var configuration = builder.Configuration; // allows both to access and to set u
 var environment = builder.Environment;
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(o =>
+    {
+        o.JsonSerializerOptions.Converters.Add(new DateTimeShortConverter());
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 

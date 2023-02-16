@@ -11,4 +11,6 @@ public class HotelDto
     public string Address { get; set; } = string.Empty;
     public int? Stars { get; set; }
     public int Price { get; set; }
+
+    public string FullAddress { get; set; } = string.Empty;
 }

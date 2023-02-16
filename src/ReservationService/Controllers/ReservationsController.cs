@@ -27,9 +27,6 @@ public class ReservationsController : ControllerCrudBase<Reservation, Reservatio
     protected override IQueryable<Reservation> AttachFilterToQueryable(IQueryable<Reservation> q, ReservationFilter f)
         => q.WhereNext(f.UserName, x => x.Username == f.UserName);
 
-    protected override IQueryable<Reservation> AttachEagerLoadingStrategyToQueryable(IQueryable<Reservation> q)
-        => q.Include(x => x.Hotel);
-
     protected override void MapDtoToEntity(Reservation e, ReservationDto dto)
     {
         e.Username = dto.UserName;
@@ -39,5 +36,15 @@ public class ReservationsController : ControllerCrudBase<Reservation, Reservatio
         e.PaymentUid = dto.PaymentUid;
         e.HotelUid = dto.HotelUid;
 
+    }
+
+    protected override async Task<ReservationDto> ToDtoAsync(Reservation e)
+    {
+        var dto = Mapper.Map<ReservationDto>(e);
+
+        dto.Hotel = Mapper.Map<HotelDto>(await DbContext.Set<Hotel>()
+            .SingleAsync(x => x.HotelUid == e.HotelUid));
+
+        return dto;
     }
 }

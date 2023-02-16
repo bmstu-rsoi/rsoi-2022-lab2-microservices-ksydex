@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using SharedKernel.Common.AbstractClasses;
 
 namespace ReservationService.Data.Entities;
@@ -13,6 +14,6 @@ public class Reservation : EntityBase
 
     public Guid PaymentUid { get; set; }
 
-    public Hotel? Hotel { get; set; }
+    [NotMapped] public Hotel? Hotel { get; set; }
     public Guid? HotelUid { get; set; }
 }

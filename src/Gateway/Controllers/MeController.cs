@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gateway.Controllers;
 
+[ApiController]
+[Route("api/v1/[controller]")]
 public class MeController : ControllerBase
 {
     private readonly ReservationClientService _reservationClientService;
@@ -16,7 +18,7 @@ public class MeController : ControllerBase
             new ReservationClientService(new LoyaltyClientService(), new PaymentClientService());
     }
 
-    [HttpGet("me")]
+    [HttpGet]
     public async Task<ActionResult<UserInfoDto>> Me([FromHeader(Name = HeaderConstants.UserName)] string userName)
         => Ok(await _reservationClientService.GetUserInfoAsync(userName));
 }

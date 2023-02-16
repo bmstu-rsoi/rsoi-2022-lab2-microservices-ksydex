@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using SharedKernel.Common.AbstractClasses;
 
 namespace ReservationService.Data.Entities;
@@ -12,6 +13,8 @@ public class Hotel : EntityBase
     public string Address { get; set; } = string.Empty;
     public int? Stars { get; set; }
     public int Price { get; set; }
+
+    [NotMapped] public string FullAddress => $"{Country}, {City}, {Address}";
 
     public List<Reservation>? Reservations { get; set; }
 }

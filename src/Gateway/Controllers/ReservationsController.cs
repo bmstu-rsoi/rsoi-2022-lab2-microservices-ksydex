@@ -22,7 +22,7 @@ public class ReservationsController : ControllerBase
         [FromHeader(Name = HeaderConstants.UserName)]
         string userName, [FromQuery] int page = 1,
         [FromQuery] int size = 10)
-        => Ok(await _reservationClientService.GetAllReservationsAsync(page, size, userName));
+        => Ok((await _reservationClientService.GetAllReservationsAsync(page, size, userName))!.Items);
 
     [HttpGet("{uId}")]
     public async Task<ActionResult<ReservationDto>> GetByUId(string uId)
@@ -30,7 +30,7 @@ public class ReservationsController : ControllerBase
 
 
     [HttpPost]
-    public async Task<ActionResult<ReservationDto>> Book(BookHotelDto model,
+    public async Task<ActionResult<ReservationBookDto>> Book(BookHotelDto model,
         [FromHeader(Name = HeaderConstants.UserName)]
         string userName)
         => Ok(await _reservationClientService.BookHotelAsync(model.HotelUid, model.StartDate, model.EndDate, userName));
@@ -40,5 +40,8 @@ public class ReservationsController : ControllerBase
     public async Task<ActionResult<ReservationDto>> Book(string uId,
         [FromHeader(Name = HeaderConstants.UserName)]
         string userName)
-        => Ok(await _reservationClientService.CancelBookHotelAsync(uId, userName));
+    {
+        await _reservationClientService.CancelBookHotelAsync(uId, userName);
+        return NoContent();
+    }
 }
